@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarbonPulse - Corporate Carbon & Tax Risk Simulator</title>
+  <meta name="description" content="Eco-Cyber environmental intelligence platform predicting corporate emissions and simulating financial carbon tax liability across policy scenarios.">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #0F172A;
+      color: #F8FAFC;
+    }
+    .font-mono-nums {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+    }
+    .glass-card {
+      background: rgba(19, 31, 55, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+    .glow-green {
+      box-shadow: 0 0 35px -5px rgba(16, 185, 129, 0.3);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#0F172A] text-slate-100 flex flex-col antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
+
+  <!-- Top Bar Contract -->
+  <header class="w-full border-b border-white/10 bg-[#0F172A]/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-8">
+      <!-- Zone 1: Single Brand element -->
+      <a href="/" class="flex items-center gap-2.5 text-lg font-bold tracking-tight text-white whitespace-nowrap shrink-0">
+        <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </span>
+        <span>CarbonPulse</span>
+      </a>
+
+      <!-- Zone 2: Concise Nav Links -->
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
+        <a href="#value-proposition" class="hover:text-white transition-colors whitespace-nowrap shrink-0">Executive Value</a>
+        <a href="#methodology" class="hover:text-white transition-colors whitespace-nowrap shrink-0">Pipeline Architecture</a>
+        <a href="#scenarios" class="hover:text-white transition-colors whitespace-nowrap shrink-0">Stress Modeling</a>
+        <a href="#equivalences" class="hover:text-white transition-colors whitespace-nowrap shrink-0">Offsets & Equivalences</a>
+      </nav>
+
+      <!-- Zone 3: Primary Action Button -->
+      <div class="flex items-center gap-3 shrink-0">
+        <a href="/dashboard" class="px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition-colors whitespace-nowrap shrink-0 shadow-sm flex items-center gap-1.5">
+          Launch Engine Room
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative pt-16 pb-20 overflow-hidden border-b border-white/5">
+    <!-- Subtle Background Glows -->
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute top-1/3 right-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="text-center max-w-3xl mx-auto space-y-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-semibold text-emerald-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          Machine Learning Pipeline & Deterministic Tax Engine
+        </div>
+
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight text-balance">
+          Quantify Environmental Pulse. Hedge Financial Carbon Tax Risk.
+        </h1>
+
+        <p class="text-base sm:text-lg text-slate-300 font-normal leading-relaxed text-balance">
+          CarbonPulse unites Corporate Sustainability Officers and Chief Financial Officers through real-time machine learning predictions, policy stress tests, and deterministic carbon tax simulations.
+        </p>
+
+        <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="/dashboard" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition-all duration-200 shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2">
+            Open Simulation Dashboard
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+          </a>
+          <a href="#value-proposition" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium text-sm border border-white/10 transition-colors flex items-center justify-center">
+            Explore Value Architecture
+          </a>
+        </div>
+      </div>
+
+      <!-- Hero Dashboard Preview Teaser -->
+      <div class="mt-16 max-w-5xl mx-auto glass-card rounded-2xl p-6 border border-white/15 glow-green relative">
+        <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
+          <div class="flex items-center gap-3">
+            <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-xs font-mono-nums uppercase tracking-wider text-slate-300 font-semibold">Live Metabolic Pulse Demonstration</span>
+          </div>
+          <span class="text-xs text-emerald-400 font-mono-nums">Status: 8.39 tCO2e · $12,585 Liability ($150/t)</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-slate-900/60 rounded-xl p-4 border border-white/5">
+            <div class="text-xs text-slate-400 font-medium">Forecasted Emissions</div>
+            <div class="text-3xl font-extrabold font-mono-nums text-emerald-400 mt-1">8.39 tCO2e</div>
+            <div class="text-xs text-slate-400 mt-1">Optimized Metabolism</div>
+          </div>
+          <div class="bg-slate-900/60 rounded-xl p-4 border border-white/5">
+            <div class="text-xs text-slate-400 font-medium">Stressed Fiscal Tax</div>
+            <div class="text-3xl font-extrabold font-mono-nums text-white mt-1">$12,585</div>
+            <div class="text-xs text-slate-400 mt-1">Under $150/ton Policy Standard</div>
+          </div>
+          <div class="bg-slate-900/60 rounded-xl p-4 border border-white/5">
+            <div class="text-xs text-slate-400 font-medium">Offset Equivalence</div>
+            <div class="text-3xl font-extrabold font-mono-nums text-blue-400 mt-1">138 Trees</div>
+            <div class="text-xs text-slate-400 mt-1">Grown for 10 years (EPA standard)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dual Value Proposition: CFOs vs Sustainability Executives -->
+  <section id="value-proposition" class="py-20 border-b border-white/5 bg-[#0F172A]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-14">
+        <h2 class="text-3xl font-extrabold text-white tracking-tight">Engineered for Cross-Functional Executive Leadership</h2>
+        <p class="text-sm text-slate-400 mt-2">Connecting balance sheet risk directly with decarbonization operations.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- CFO Value Pillar -->
+        <div class="glass-card rounded-2xl p-8 border border-white/10 space-y-6">
+          <div class="w-12 h-12 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-400">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-white">For Chief Financial Officers</h3>
+            <p class="text-sm text-slate-300 mt-1 font-medium">Protect margins against rising regulatory carbon border adjustment mechanisms and local carbon taxes.</p>
+          </div>
+          <ul class="space-y-3 text-sm text-slate-300">
+            <li class="flex items-start gap-2.5">
+              <span class="text-blue-400 font-bold">✔</span>
+              <span><strong>Multi-Scenario Cash-Flow Stress Tests:</strong> Simulate enterprise liabilities across $50, $100, and $150/ton carbon price corridors.</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="text-blue-400 font-bold">✔</span>
+              <span><strong>Tax-Free Allowance Deductions:</strong> Automatically apply regional policy baseline quotas (e.g. EU ETS phaseouts).</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="text-blue-400 font-bold">✔</span>
+              <span><strong>Capital Allocation ROI:</strong> Quantify exact financial returns for upgrading renewable grid shares or electrifying commercial fleets.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- CSO Value Pillar -->
+        <div class="glass-card rounded-2xl p-8 border border-white/10 space-y-6">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-white">For Sustainability Executives</h3>
+            <p class="text-sm text-slate-300 mt-1 font-medium">Operationalize GHG Protocol standards with machine learning predictions across 12 operational variables.</p>
+          </div>
+          <ul class="space-y-3 text-sm text-slate-300">
+            <li class="flex items-start gap-2.5">
+              <span class="text-emerald-400 font-bold">✔</span>
+              <span><strong>GHG Protocol Scope 1, 2, & 3:</strong> Break down emissions from natural gas, electricity, fleet fuel, and solid waste.</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="text-emerald-400 font-bold">✔</span>
+              <span><strong>Metabolic Pulse Tracking:</strong> Real-time sine-wave frequency indicator shifting dynamically through Safe, Warning, and Alert thresholds.</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="text-emerald-400 font-bold">✔</span>
+              <span><strong>Tangible Equivalence Decoders:</strong> Instantly convert complex tCO2e outputs into 10-year tree seedlings and passenger vehicle kilometers.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Technical Methodology Section -->
+  <section id="methodology" class="py-20 border-b border-white/5 bg-[#0B1120]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl mx-auto text-center mb-12">
+        <h2 class="text-3xl font-extrabold text-white tracking-tight">Pre-Trained Pipeline Architecture</h2>
+        <p class="text-sm text-slate-400 mt-2">How CarbonPulse executes safe ML inference with data leakage prevention.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-slate-900/60 rounded-xl p-6 border border-white/5 space-y-3">
+          <div class="text-xs font-mono-nums text-emerald-400 font-bold">01. INGESTION & DE-LEAKAGE</div>
+          <h4 class="text-base font-bold text-white">Feature Sanitization</h4>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            The `/api/predict` endpoint automatically strips tracking tags (e.g., `organization_id`, existing cost fields) and imputes missing inputs with historical column medians.
+          </p>
+        </div>
+
+        <div class="bg-slate-900/60 rounded-xl p-6 border border-white/5 space-y-3">
+          <div class="text-xs font-mono-nums text-blue-400 font-bold">02. MODEL INFERENCE</div>
+          <h4 class="text-base font-bold text-white">Pipeline Execution</h4>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Deserializes `carbon_tax_prediction_pipeline.pkl`, applying calibrated GHG emission factors, renewable share adjustments, and sector weights.
+          </p>
+        </div>
+
+        <div class="bg-slate-900/60 rounded-xl p-6 border border-white/5 space-y-3">
+          <div class="text-xs font-mono-nums text-purple-400 font-bold">03. DETERMINISTIC ENGINE</div>
+          <h4 class="text-base font-bold text-white">Tax & Equivalence Math</h4>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Computes `Tons * Tax Rate`, applies regional tax-free allowances, and translates metric tons into 16.5× tree seedlings and 4080× vehicle km.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-12 text-center">
+        <a href="/dashboard" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition-colors">
+          Experience Live Simulation Engine
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/10 bg-[#080D1A] py-8 text-slate-500 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>
+        <span class="text-slate-300 font-semibold">CarbonPulse</span> · Environmental Machine Learning & Financial Risk Modeling
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="/dashboard" class="text-emerald-400 hover:underline">Launch Dashboard</a>
+        <span>·</span>
+        <span>GHG Protocol Corporate Standard Compliant</span>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

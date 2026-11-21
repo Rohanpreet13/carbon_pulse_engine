@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarbonPulse Engine - Live Corporate Carbon & Tax Risk Simulator</title>
+  <meta name="description" content="Simulate corporate carbon emissions and model multi-scenario financial tax risk with CarbonPulse.">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #0F172A;
+      color: #F8FAFC;
+    }
+    .font-mono-nums {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+    }
+    .glass-card {
+      background: rgba(19, 31, 55, 0.72);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+    input[type=range] {
+      accent-color: #10B981;
+    }
+    details summary::-webkit-details-marker {
+      display: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#0F172A] text-slate-100 flex flex-col antialiased">
+
+  <!-- Top Bar Contract -->
+  <header class="w-full border-b border-white/10 bg-[#0F172A]/90 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-8">
+      <!-- Zone 1: Wordmark -->
+      <button onclick="switchView('overview')" class="flex items-center gap-2.5 text-lg font-bold tracking-tight text-white whitespace-nowrap shrink-0 hover:opacity-90 transition-opacity cursor-pointer">
+        <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+        </span>
+        <span>CarbonPulse Engine</span>
+      </button>
+
+      <!-- Zone 2: Navigation Links (All 4 Fully Functional) -->
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+        <button id="nav-btn-overview" onclick="switchView('overview')" class="text-slate-400 hover:text-white transition-colors whitespace-nowrap cursor-pointer py-1">
+          Executive Overview
+        </button>
+        <button id="nav-btn-engine" onclick="switchView('engine')" class="text-emerald-400 font-bold border-b-2 border-emerald-400 whitespace-nowrap cursor-pointer py-1">
+          Simulation Engine
+        </button>
+        <button id="nav-btn-stress" onclick="switchView('stress')" class="text-slate-400 hover:text-white transition-colors whitespace-nowrap cursor-pointer py-1">
+          Stress Scenarios
+        </button>
+        <button id="nav-btn-equivalence" onclick="switchView('equivalence')" class="text-slate-400 hover:text-white transition-colors whitespace-nowrap cursor-pointer py-1">
+          Equivalence Decoders
+        </button>
+      </nav>
+
+      <!-- Zone 3: Actions -->
+      <div class="flex items-center gap-3 shrink-0">
+        <button id="btn-export-csv" onclick="exportCSVReport()" class="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-white/10 transition-colors whitespace-nowrap cursor-pointer">
+          <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Export CSV
+        </button>
+        <button onclick="resetDefaults()" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 transition-colors whitespace-nowrap cursor-pointer">
+          Reset Model
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Animated Sine Wave Header (Metabolic Pulse) -->
+  <section class="border-b border-white/10 bg-[#0B1120] relative overflow-hidden py-3">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3 shrink-0">
+        <div id="pulse-dot-indicator" class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_12px_#10B981] animate-pulse"></div>
+        <div>
+          <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold block">Environmental Metabolic Pulse</span>
+          <div class="flex items-center gap-2">
+            <span id="pulse-status-badge" class="text-xs font-bold text-emerald-400">Optimized Metabolism</span>
+            <span class="text-xs text-slate-600">·</span>
+            <span id="pulse-intensity-display" class="text-xs font-mono-nums text-slate-300">2.65 tCO2e / $M</span>
+          </div>
+        </div>
+      </div>
+      <div class="w-full md:w-2/3 h-12 relative overflow-hidden">
+        <canvas id="pulse-canvas" class="w-full h-full block rounded-lg"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN VIEWPORT CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- VIEW 1: EXECUTIVE OVERVIEW (LANDING) -->
+    <section id="view-overview" class="hidden space-y-12 pb-12">
+      <div class="text-center max-w-3xl mx-auto space-y-5 pt-4">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-xs font-semibold text-emerald-400">
+          <span>Production Machine Learning Pipeline & Financial Carbon Engine</span>
+        </div>
+        <h1 class="text-4xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
+          Quantify Environmental Pulse. Hedge Financial Tax Risk.
+        </h1>
+        <p class="text-base text-slate-300 leading-relaxed">
+          CarbonPulse unites Corporate Sustainability Officers and Chief Financial Officers through real-time machine learning predictions, policy stress tests, and deterministic carbon tax simulations.
+        </p>
+        <div class="pt-2 flex justify-center gap-4">
+          <button onclick="switchView('engine')" class="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition-all shadow-lg shadow-emerald-500/20 cursor-pointer">
+            Launch Simulation Engine Room →
+          </button>
+          <button onclick="switchView('stress')" class="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium text-sm border border-white/10 transition-colors cursor-pointer">
+            View Stress Scenarios
+          </button>
+        </div>
+      </div>
+
+      <!-- Dual Value Matrix -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto pt-4">
+        <div class="glass-card rounded-2xl p-7 border border-white/10 space-y-4">
+          <div class="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-400 font-bold">CFO</div>
+          <h3 class="text-lg font-bold text-white">For Chief Financial Officers</h3>
+          <p class="text-xs text-slate-400">Protect balance sheets against accelerating carbon border adjustment taxes and regional policy corridors.</p>
+          <ul class="space-y-2.5 text-xs text-slate-300">
+            <li class="flex items-start gap-2"><span class="text-blue-400">✔</span><span><strong>Policy Stress Testing:</strong> Model tax liabilities across $50, $100, and $150/t price corridors.</span></li>
+            <li class="flex items-start gap-2"><span class="text-blue-400">✔</span><span><strong>Tax-Free Allowance Deductions:</strong> Automatically apply regional grandfathering and free quotas.</span></li>
+            <li class="flex items-start gap-2"><span class="text-blue-400">✔</span><span><strong>CapEx Return Optimization:</strong> Quantify savings of clean grid power and fleet electrification.</span></li>
+          </ul>
+        </div>
+
+        <div class="glass-card rounded-2xl p-7 border border-white/10 space-y-4">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold">CSO</div>
+          <h3 class="text-lg font-bold text-white">For Sustainability Officers</h3>
+          <p class="text-xs text-slate-400">Operationalize GHG Protocol corporate reporting across Scope 1 direct, Scope 2 electricity, and Scope 3 waste.</p>
+          <ul class="space-y-2.5 text-xs text-slate-300">
+            <li class="flex items-start gap-2"><span class="text-emerald-400">✔</span><span><strong>Dynamic Metabolic Pulse:</strong> Real-time animated sine-wave frequency reflecting intensity.</span></li>
+            <li class="flex items-start gap-2"><span class="text-emerald-400">✔</span><span><strong>12-Feature Pipeline:</strong> Natural gas, grid electricity, diesel, waste, volume, and headcount.</span></li>
+            <li class="flex items-start gap-2"><span class="text-emerald-400">✔</span><span><strong>Decoded Equivalencies:</strong> Translate abstract tCO2e outputs into 10-year tree seedlings and passenger km.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: SIMULATION ENGINE ROOM (PRIMARY DASHBOARD) -->
+    <section id="view-engine" class="space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- LEFT SIDEBAR: 12 TARGET FEATURES CATEGORIZED -->
+        <aside class="lg:col-span-4 space-y-4">
+          <div class="glass-card rounded-xl p-5 border border-white/10 space-y-4">
+            <div class="flex flex-col sm:flex-row lg:flex-col xl:flex-row items-start sm:items-center lg:items-start xl:items-center justify-between gap-2 pb-3 border-b border-white/10">
+              <div>
+                <h2 class="text-base font-bold text-white tracking-tight">Enterprise Model Inputs</h2>
+                <p class="text-xs text-slate-400">12 Features mapped to ML Pipeline</p>
+              </div>
+              <select id="preset-selector" onchange="applyPreset(this.value)" class="text-xs bg-slate-800 text-slate-200 border border-white/10 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer">
+                <option value="manufacturing">Preset: Manufacturing Factory</option>
+                <option value="tech">Preset: Cloud & Data Center</option>
+                <option value="logistics">Preset: Logistics Fleet</option>
+                <option value="heavy">Preset: Heavy Industry Operator</option>
+              </select>
+            </div>
+
+            <form id="simulation-form" class="space-y-3.5" onsubmit="event.preventDefault(); triggerSimulation();">
+
+              <!-- Category 1: Governance & Scope -->
+              <details open class="group border border-white/5 bg-slate-900/50 rounded-lg p-3 transition-colors">
+                <summary class="flex items-center justify-between text-xs font-semibold text-slate-200 cursor-pointer list-none select-none">
+                  <span>1. Jurisdiction & Governance</span>
+                  <span class="text-slate-400 group-open:rotate-180 transition-transform text-xs">▼</span>
+                </summary>
+                <div class="grid grid-cols-2 gap-3 mt-3 pt-2 border-t border-white/5">
+                  <div>
+                    <label class="block text-[11px] text-slate-400 mb-1" for="input-year">Target Fiscal Year</label>
+                    <select id="input-year" class="w-full bg-slate-800 border border-white/10 text-xs rounded-lg px-2.5 py-2 text-white">
+                      <option value="2025">2025</option>
+                      <option value="2026">2026</option>
+                      <option value="2027" selected>2027</option>
+                      <option value="2028">2028</option>
+                      <option value="2030">2030</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[11px] text-slate-400 mb-1" for="input-industry">Industry Sector</label>
+                    <select id="input-industry" class="w-full bg-slate-800 border border-white/10 text-xs rounded-lg px-2.5 py-2 text-white">
+                      <option value="Manufacturing" selected>Manufacturing</option>
+                      <option value="Energy">Energy & Utilities</option>
+                      <option value="Technology">Technology & Cloud</option>
+                      <option value="Transport & Logistics">Transport & Logistics</option>
+                      <option value="Heavy Industry">Heavy Industry</option>
+                      <option value="Construction">Construction</option>
+                      <option value="Healthcare">Healthcare</option>
+                      <option value="Retail">Retail & Consumer</option>
+                    </select>
+                  </div>
+                  <div class="col-span-2">
+                    <label class="block text-[11px] text-slate-400 mb-1" for="input-region">Regulatory Region</label>
+                    <select id="input-region" class="w-full bg-slate-800 border border-white/10 text-xs rounded-lg px-2.5 py-2 text-white">
+                      <option value="Europe" selected>Europe (EU ETS Policy)</option>
+                      <option value="North America">North America (US Clean Air Act)</option>
+                      <option value="Asia-Pacific">Asia-Pacific (Carbon Market)</option>
+                      <option value="Latin America">Latin America</option>
+                      <option value="Middle East & Africa">Middle East & Africa</option>
+                    </select>
+                  </div>
+                </div>
+              </details>
+
+              <!-- Category 2: Operational Scale & Output -->
+              <details open class="group border border-white/5 bg-slate-900/50 rounded-lg p-3 transition-colors">
+                <summary class="flex items-center justify-between text-xs font-semibold text-slate-200 cursor-pointer list-none select-none">
+                  <span>2. Operational Scale & Output</span>
+                  <span class="text-slate-400 group-open:rotate-180 transition-transform text-xs">▼</span>
+                </summary>
+                <div class="space-y-3 mt-3 pt-2 border-t border-white/5 text-xs">
+                  <div class="flex items-center justify-between gap-3">
+                    <label class="text-slate-400" for="input-employees">Employee Count</label>
+                    <input id="input-employees" type="number" min="1" max="100000" value="518" class="w-24 bg-slate-800 border border-white/10 rounded-lg px-2 py-1 text-right font-mono-nums text-white">
+                  </div>
+                  <div class="flex items-center justify-between gap-3">
+                    <label class="text-slate-400" for="input-revenue">Annual Revenue ($M)</label>
+                    <input id="input-revenue" type="number" step="1" min="0.1" value="3165.0" class="w-24 bg-slate-800 border border-white/10 rounded-lg px-2 py-1 text-right font-mono-nums text-white">
+                  </div>
+                  <div class="flex items-center justify-between gap-3">
+                    <label class="text-slate-400" for="input-output">Output Volume (k Units)</label>
+                    <input id="input-output" type="number" step="0.1" min="0.1" value="9.6" class="w-24 bg-slate-800 border border-white/10 rounded-lg px-2 py-1 text-right font-mono-nums text-white">
+                  </div>
+                  <div class="flex items-center justify-between gap-3">
+                    <label class="text-slate-400" for="input-fleet">Fleet Size (Vehicles)</label>
+                    <input id="input-fleet" type="number" min="0" value="25" class="w-24 bg-slate-800 border border-white/10 rounded-lg px-2 py-1 text-right font-mono-nums text-white">
+                  </div>
+                </div>
+              </details>
+
+              <!-- Category 3: Resource Projections -->
+              <details open class="group border border-white/5 bg-slate-900/50 rounded-lg p-3 transition-colors">
+                <summary class="flex items-center justify-between text-xs font-semibold text-slate-200 cursor-pointer list-none select-none">
+                  <span>3. Resource Projections</span>
+                  <span class="text-slate-400 group-open:rotate-180 transition-transform text-xs">▼</span>
+                </summary>
+                <div class="space-y-3.5 mt-3 pt-2 border-t border-white/5">
+                  <div>
+                    <div class="flex justify-between text-xs mb-1">
+                      <span class="text-slate-400">Electricity Demand</span>
+                      <span class="font-mono-nums text-emerald-400"><span id="val-elec">4.3</span> MWh</span>
+                    </div>
+                    <input id="input-elec" type="range" min="0.5" max="60" step="0.1" value="4.3" class="w-full h-1.5 bg-slate-700 rounded-lg cursor-pointer accent-emerald-500">
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between text-xs mb-1">
+                      <span class="text-slate-400">Natural Gas Demand</span>
+                      <span class="font-mono-nums text-blue-400"><span id="val-gas">17.2</span> MMBtu</span>
+                    </div>
+                    <input id="input-gas" type="range" min="1" max="150" step="0.5" value="17.2" class="w-full h-1.5 bg-slate-700 rounded-lg cursor-pointer accent-blue-500">
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between text-xs mb-1">
+                      <span class="text-slate-400">Diesel Fleet Fuel</span>
+                      <span class="font-mono-nums text-amber-400"><span id="val-diesel">75</span> Liters</span>
+                    </div>
+                    <input id="input-diesel" type="range" min="5" max="500" step="1" value="75" class="w-full h-1.5 bg-slate-700 rounded-lg cursor-pointer accent-amber-500">
+                  </div>
+
+                  <!-- Highlighted Renewable Grid Share -->
+                  <div class="p-3 rounded-lg border border-emerald-500/40 bg-emerald-950/20 shadow-[0_0_18px_-4px_rgba(16,185,129,0.25)]">
+                    <div class="flex justify-between text-xs mb-1.5">
+                      <span class="text-emerald-300 font-semibold">Renewable Grid Share (%)</span>
+                      <span class="font-mono-nums font-bold text-emerald-400 text-sm"><span id="val-renewable">45</span>%</span>
+                    </div>
+                    <input id="input-renewable" type="range" min="0" max="100" step="1" value="45" class="w-full h-2 bg-slate-700 rounded-lg cursor-pointer accent-emerald-400">
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between text-xs mb-1">
+                      <span class="text-slate-400">Solid Waste Generated</span>
+                      <span class="font-mono-nums text-purple-400"><span id="val-waste">0.24</span> Tons</span>
+                    </div>
+                    <input id="input-waste" type="range" min="0.01" max="5" step="0.05" value="0.24" class="w-full h-1.5 bg-slate-700 rounded-lg cursor-pointer accent-purple-500">
+                  </div>
+                </div>
+              </details>
+
+            </form>
+          </div>
+        </aside>
+
+        <!-- MAIN BODY: 3 KPIS + POLICY STRESS CHART + EQUIVALENCE PANEL -->
+        <div class="lg:col-span-8 space-y-6">
+
+          <!-- 3 KPI BLOCK HEADERS (MATCHING MOCKUP) -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- KPI 1 -->
+            <div class="glass-card rounded-xl p-5 border border-white/10 relative overflow-hidden">
+              <span class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold block mb-1">
+                Forecasted Emissions (<span id="kpi-year">2027</span>)
+              </span>
+              <div class="flex items-baseline gap-2 my-2">
+                <span id="kpi-emissions" class="text-4xl font-extrabold font-mono-nums text-emerald-400">8.39</span>
+                <span class="text-lg font-bold text-slate-400">tCO2e</span>
+              </div>
+              <div id="kpi-status-container" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                <span>✔</span>
+                <span id="kpi-status-text">Optimized Metabolism</span>
+              </div>
+            </div>
+
+            <!-- KPI 2 -->
+            <div class="glass-card rounded-xl p-5 border border-white/10 relative overflow-hidden">
+              <span class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold block mb-1">
+                Projected Fiscal Liability
+              </span>
+              <div class="flex items-baseline gap-1 my-2">
+                <span class="text-2xl font-bold text-slate-400">$</span>
+                <span id="kpi-tax-liability" class="text-4xl font-extrabold font-mono-nums text-white">12,585</span>
+              </div>
+              <div class="text-xs text-slate-400">
+                <span id="kpi-tax-rate-label" class="text-slate-300 font-medium">($150/ton tax)</span>
+                <span class="block text-[11px] text-slate-500 mt-0.5">Based on Regional Policy Baseline</span>
+              </div>
+            </div>
+
+            <!-- KPI 3 (Gauge) -->
+            <div class="glass-card rounded-xl p-5 border border-white/10 flex flex-col items-center justify-between">
+              <span class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold self-start mb-1">
+                Carbon Pulse Strength
+              </span>
+              <div class="w-full flex flex-col items-center justify-center my-1">
+                <svg viewBox="0 0 160 85" class="w-36 h-20 overflow-visible">
+                  <path d="M 20 80 A 60 60 0 0 1 140 80" fill="none" stroke="#1E293B" stroke-width="12" stroke-linecap="round"/>
+                  <path d="M 20 80 A 60 60 0 0 1 58 33" fill="none" stroke="#10B981" stroke-width="12" stroke-linecap="round"/>
+                  <path d="M 58 33 A 60 60 0 0 1 102 33" fill="none" stroke="#F59E0B" stroke-width="12"/>
+                  <path d="M 102 33 A 60 60 0 0 1 140 80" fill="none" stroke="#EF4444" stroke-width="12" stroke-linecap="round"/>
+                  <g id="gauge-needle-group" transform="rotate(-60, 80, 80)" class="transition-transform duration-700 ease-out">
+                    <line x1="80" y1="80" x2="80" y2="28" stroke="#F8FAFC" stroke-width="3.5" stroke-linecap="round"/>
+                    <circle cx="80" cy="80" r="7" fill="#F8FAFC"/>
+                    <circle cx="80" cy="80" r="3.5" fill="#0F172A"/>
+                  </g>
+                </svg>
+                <div id="kpi-intensity-label" class="text-xs font-bold text-emerald-400 mt-1">
+                  Low Intensity
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MULTI-SCENARIO POLICY STRESS TEST -->
+          <div class="glass-card rounded-xl p-6 border border-white/10 space-y-4">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
+              <div>
+                <h3 class="text-base font-bold text-white">Policy Stress Test: Tax Liability Scenarios</h3>
+                <p class="text-xs text-slate-400 mt-0.5">Exposure modeling under $50, $100, $150/ton, and custom carbon prices</p>
+              </div>
+              <div class="flex items-center gap-2 bg-slate-900/90 px-3 py-1.5 rounded-lg border border-white/10">
+                <span class="text-xs text-slate-300 font-medium">Selected Rate:</span>
+                <span class="font-mono-nums font-bold text-emerald-400 text-xs">$<span id="label-custom-rate">150</span>/t</span>
+                <input id="slider-custom-rate" type="range" min="20" max="300" step="5" value="150" class="w-20 h-1.5 bg-slate-700 cursor-pointer accent-emerald-500">
+              </div>
+            </div>
+
+            <!-- 3 Bars -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+              <div class="bg-slate-900/60 rounded-xl p-4 border border-white/5 flex flex-col justify-between">
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="text-xs font-semibold text-slate-300">$50/ton</span>
+                    <span class="text-[11px] text-slate-400">Baseline</span>
+                  </div>
+                  <div class="text-xl font-bold font-mono-nums text-white my-1" id="tax-bill-50">$4,195</div>
+                  <div class="text-[11px] text-slate-400">Gross: <span id="gross-bill-50" class="font-mono-nums text-slate-300">$4,195</span></div>
+                </div>
+                <div class="mt-4 flex items-end gap-2 h-24 pt-2 border-t border-white/5">
+                  <div class="w-1/2 flex flex-col items-center gap-1">
+                    <div id="bar-50-base" class="w-full bg-blue-500/80 rounded-t transition-all duration-500" style="height: 35%;"></div>
+                    <span class="text-[10px] text-slate-400">Gross</span>
+                  </div>
+                  <div class="w-1/2 flex flex-col items-center gap-1">
+                    <div id="bar-50-net" class="w-full bg-rose-500/80 rounded-t transition-all duration-500" style="height: 28%;"></div>
+                    <span class="text-[10px] text-slate-400">Net Tax</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-slate-900/60 rounded-xl p-4 border border-white/5 flex flex-col justify-between">
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="text-xs font-semibold text-slate-300">$100/ton</span>
+                    <span class="text-[11px] text-slate-400">Transition</span>
+                  </div>
+                  <div class="text-xl font-bold font-mono-nums text-white my-1" id="tax-bill-100">$8,390</div>
+                  <div class="text-[11px] text-slate-400">Gross: <span id="gross-bill-100" class="font-mono-nums text-slate-300">$8,390</span></div>
+                </div>
+                <div class="mt-4 flex items-end gap-2 h-24 pt-2 border-t border-white/5">
+                  <div class="w-1/2 flex flex-col items-center gap-1">
+                    <div id="bar-100-base" class="w-full bg-blue-500/80 rounded-t transition-all duration-500" style="height: 65%;"></div>
+                    <span class="text-[10px] text-slate-400">Gross</span>
+                  </div>
+                  <div class="w-1/2 flex flex-col items-center gap-1">
+                    <div id="bar-100-net" class="w-full bg-rose-500/80 rounded-t transition-all duration-500" style="height: 52%;"></div>
+                    <span class="text-[10px] text-slate-400">Net Tax</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-slate-900/60 rounded-xl p-4 border border-emerald-500/30 flex flex-col justify-between shadow-[0_0_15px_-4px_rgba(16,185,129,0.15)]">
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="text-xs font-semibold text-emerald-400">$150/ton</span>
+                    <span class="text-[11px] text-emerald-400/80 font-medium">Stressed Standard</span>
+                  </div>
+                  <div class="text-xl font-bold font-mono-nums text-white my-1" id="tax-bill-150">$12,585</div>
+                  <div class="text-[11px] text-slate-400">Gross: <span id="gross-bill-150" class="font-mono-nums text-slate-300">$12,585</span></div>
+                </div>
+                <div class="mt-4 flex items-end gap-2 h-24 pt-2 border-t border-white/5">
+                  <div class="w-1/2 flex flex-col items-center gap-1">
+                    <div id="bar-150-base" class="w-full bg-blue-500/90 rounded-t transition-all duration-500" style="height: 95%;"></div>
+                    <span class="text-[10px] text-slate-400">Gross</span>
+                  </div>
+                  <div class="w-1/2 flex flex-col items-center gap-1">
+                    <div id="bar-150-net" class="w-full bg-rose-500/90 rounded-t transition-all duration-500" style="height: 80%;"></div>
+                    <span class="text-[10px] text-slate-400">Net Tax</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-2">
+              <span class="text-xs text-slate-400">Need advanced risk matrices & global benchmarks?</span>
+              <button onclick="switchView('stress')" class="text-xs font-bold text-emerald-400 hover:text-emerald-300 cursor-pointer">
+                Explore Dedicated Stress Scenarios View →
+              </button>
+            </div>
+          </div>
+
+          <!-- OFFSET EQUIVALENCE -->
+          <div class="glass-card rounded-xl p-6 border border-white/10 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-white/10">
+              <h3 class="text-base font-bold text-white">Offset Equivalence (Decode the Pulse)</h3>
+              <div class="text-xs font-mono-nums text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20">
+                <span id="offset-emissions-sync">8.39</span> tCO2e Total
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="bg-slate-900/60 rounded-xl p-4 border border-white/5">
+                <div class="text-2xl font-extrabold font-mono-nums text-white" id="equiv-trees">138</div>
+                <div class="text-xs font-semibold text-slate-200 mt-0.5">Tree Seedlings</div>
+                <p class="text-[11px] text-slate-400 mt-1">Grown 10 years (EPA 16.5×)</p>
+              </div>
+              <div class="bg-slate-900/60 rounded-xl p-4 border border-white/5">
+                <div class="text-2xl font-extrabold font-mono-nums text-white" id="equiv-km">34,231 km</div>
+                <div class="text-xs font-semibold text-slate-200 mt-0.5">Passenger Vehicle KM</div>
+                <p class="text-[11px] text-slate-400 mt-1">Average gasoline car (4,080 km/t)</p>
+              </div>
+              <div class="bg-slate-900/60 rounded-xl p-4 border border-white/5">
+                <div class="text-2xl font-extrabold font-mono-nums text-white" id="equiv-oil">19.5</div>
+                <div class="text-xs font-semibold text-slate-200 mt-0.5">Barrels Crude Oil</div>
+                <p class="text-[11px] text-slate-400 mt-1">Direct energy equivalent (2.32 bbl/t)</p>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-1">
+              <span class="text-xs text-slate-400">Want voluntary carbon credit retirement modeling?</span>
+              <button onclick="switchView('equivalence')" class="text-xs font-bold text-emerald-400 hover:text-emerald-300 cursor-pointer">
+                Open Full Equivalence Decoders →
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: DEDICATED STRESS SCENARIOS VIEW -->
+    <section id="view-stress" class="hidden space-y-6 pb-12">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+        <div>
+          <h2 class="text-2xl font-extrabold text-white">Policy Stress Scenarios & Fiscal Risk Matrix</h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Evaluate liabilities against EU ETS, UK ETS, US CARB, and 1.5°C Net-Zero benchmarks.</p>
+        </div>
+        <button onclick="switchView('engine')" class="px-4 py-2 text-xs font-bold rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition-colors cursor-pointer">
+          ← Return to Engine Inputs
+        </button>
+      </div>
+
+      <!-- Compliance Regimes Comparison Table -->
+      <div class="glass-card rounded-2xl p-6 border border-white/10 space-y-4">
+        <h3 class="text-base font-bold text-white">International Compliance Regimes Comparison</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left border-collapse">
+            <thead>
+              <tr class="border-b border-white/10 text-slate-400">
+                <th class="py-2.5 px-3">Regulatory Policy Regime</th>
+                <th class="py-2.5 px-3">Carbon Price</th>
+                <th class="py-2.5 px-3">Free Quota</th>
+                <th class="py-2.5 px-3 text-right">Gross Exposure</th>
+                <th class="py-2.5 px-3 text-right text-emerald-400">Net Tax Burden</th>
+              </tr>
+            </thead>
+            <tbody id="benchmarks-table-body" class="divide-y divide-white/5 font-mono-nums">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Sensitivity Heatmap Matrix -->
+      <div class="glass-card rounded-2xl p-6 border border-white/10 space-y-4">
+        <h3 class="text-base font-bold text-white">Fiscal Risk Matrix (Carbon Price vs Internal Abatement)</h3>
+        <p class="text-xs text-slate-400">Simulate financial tax liabilities across price trajectories and internal decarbonization progress.</p>
+        <div class="overflow-x-auto pt-2">
+          <table class="w-full text-xs text-left border-collapse">
+            <thead>
+              <tr class="border-b border-white/10 text-slate-400">
+                <th class="py-2.5 px-3 font-semibold">Carbon Tax Rate</th>
+                <th class="py-2.5 px-3 font-semibold text-right">0% Abatement</th>
+                <th class="py-2.5 px-3 font-semibold text-right text-emerald-400">20% Clean Transition</th>
+                <th class="py-2.5 px-3 font-semibold text-right text-emerald-400">40% Renewable Focus</th>
+                <th class="py-2.5 px-3 font-semibold text-right text-emerald-400">60% Net-Zero Push</th>
+              </tr>
+            </thead>
+            <tbody id="sensitivity-table-body" class="divide-y divide-white/5 font-mono-nums">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: DEDICATED EQUIVALENCE DECODERS VIEW -->
+    <section id="view-equivalence" class="hidden space-y-6 pb-12">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+        <div>
+          <h2 class="text-2xl font-extrabold text-white">Equivalence Decoders & Offset Intelligence</h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Translate complex corporate emissions into tangible metrics and calculate voluntary credit retirement budgets.</p>
+        </div>
+        <button onclick="switchView('engine')" class="px-4 py-2 text-xs font-bold rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition-colors cursor-pointer">
+          ← Return to Engine Inputs
+        </button>
+      </div>
+
+      <!-- Expanded Equivalences Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="extended-equivalences-grid">
+        <!-- Dynamically rendered -->
+      </div>
+
+      <!-- Offset Neutralization Budget Calculator -->
+      <div class="glass-card rounded-2xl p-6 border border-white/10 space-y-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
+          <div>
+            <h3 class="text-base font-bold text-white">Voluntary Carbon Credit Neutralization Planner</h3>
+            <p class="text-xs text-slate-400">Model verified credit retirement (Verra VCS / Gold Standard) to neutralize your company's pulse.</p>
+          </div>
+          <div class="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-lg border border-white/10 text-xs">
+            <span class="text-slate-400">Market Credit Price:</span>
+            <span class="font-mono-nums font-bold text-emerald-400">$<span id="label-offset-price">25</span> / credit</span>
+            <input id="slider-offset-price" oninput="updateNeutralization()" type="range" min="10" max="60" step="5" value="25" class="w-20 h-1.5 bg-slate-700 cursor-pointer accent-emerald-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-white/5">
+            <span class="text-xs text-slate-400">Annual Emissions to Neutralize</span>
+            <div class="text-2xl font-bold font-mono-nums text-white mt-1"><span id="plan-tons-neutralize">8.39</span> tCO2e</div>
+          </div>
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-white/5">
+            <span class="text-xs text-slate-400">Verified Credits Required</span>
+            <div class="text-2xl font-bold font-mono-nums text-blue-400 mt-1"><span id="plan-credits-needed">9</span> credits</div>
+          </div>
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-emerald-500/30">
+            <span class="text-xs text-emerald-400 font-semibold">Total Estimated Offset Budget</span>
+            <div class="text-2xl font-bold font-mono-nums text-emerald-400 mt-1">$<span id="plan-total-cost">225</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/10 bg-[#0B1120] py-6 text-slate-500 text-xs text-center mt-12">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <span>CarbonPulse Engine · Corporate Environmental ML & Deterministic Financial Risk System</span>
+      <div class="flex items-center gap-4">
+        <button onclick="switchView('overview')" class="text-slate-400 hover:text-white cursor-pointer">Overview</button>
+        <span>·</span>
+        <button onclick="switchView('engine')" class="text-slate-400 hover:text-white cursor-pointer">Simulation Engine</button>
+        <span>·</span>
+        <button onclick="switchView('stress')" class="text-slate-400 hover:text-white cursor-pointer">Stress Scenarios</button>
+        <span>·</span>
+        <button onclick="switchView('equivalence')" class="text-slate-400 hover:text-white cursor-pointer">Equivalence Decoders</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Complete Client Script: 100% Standalone & Synced with /api/predict -->
+  <script>
+    let currentView = 'engine';
+    let targetPulseColor = '#10B981';
+    let currentIntensity = 2.65;
+    let wavePhase = 0;
+    let latestEmissions = 8.39;
+    let latestTaxable = 6.71;
+
+    // Navigation Switcher
+    function switchView(viewName) {
+      currentView = viewName;
+      ['overview', 'engine', 'stress', 'equivalence'].forEach(v => {
+        const el = document.getElementById('view-' + v);
+        const btn = document.getElementById('nav-btn-' + v);
+        if (el) el.classList.toggle('hidden', v !== viewName);
+        if (btn) {
+          if (v === viewName) {
+            btn.className = 'text-emerald-400 font-bold border-b-2 border-emerald-400 whitespace-nowrap cursor-pointer py-1';
+          } else {
+            btn.className = 'text-slate-400 hover:text-white transition-colors whitespace-nowrap cursor-pointer py-1';
+          }
+        }
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Canvas Sine Wave
+    const canvas = document.getElementById('pulse-canvas');
+    const ctx = canvas.getContext('2d');
+    function resizeCanvas() {
+      if (!canvas || !canvas.parentElement) return;
+      canvas.width = canvas.parentElement.clientWidth * window.devicePixelRatio;
+      canvas.height = canvas.parentElement.clientHeight * window.devicePixelRatio;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function animatePulse() {
+      if (!ctx || !canvas) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const w = canvas.width;
+      const h = canvas.height;
+      const cy = h / 2;
+
+      ctx.beginPath();
+      ctx.lineWidth = 2.5 * window.devicePixelRatio;
+      ctx.strokeStyle = targetPulseColor;
+      ctx.shadowColor = targetPulseColor;
+      ctx.shadowBlur = 10 * window.devicePixelRatio;
+
+      const freq = 0.015 + (currentIntensity / 350);
+      const amp = h * 0.32;
+
+      for (let x = 0; x <= w; x += 3) {
+        const y = cy + Math.sin(x * freq + wavePhase) * amp * Math.sin(x * 0.003 + wavePhase * 0.4);
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      wavePhase += 0.045 + (currentIntensity * 0.005);
+      requestAnimationFrame(animatePulse);
+    }
+    animatePulse();
+
+    // Presets
+    const PRESETS = {
+      manufacturing: {
+        year: 2027, industry_sector: 'Manufacturing', region: 'Europe',
+        employee_count: 518, annual_revenue: 3165.0, annual_output_volume: 9.6,
+        electricity_consumption_mwh: 4.3, natural_gas_consumption_mmbtu: 17.2,
+        diesel_consumption_liters: 75, renewable_electricity_share_pct: 45,
+        fleet_size: 25, waste_generated_tons: 0.24
+      },
+      tech: {
+        year: 2027, industry_sector: 'Technology', region: 'North America',
+        employee_count: 920, annual_revenue: 14500.0, annual_output_volume: 90.0,
+        electricity_consumption_mwh: 14.5, natural_gas_consumption_mmbtu: 2.4,
+        diesel_consumption_liters: 12, renewable_electricity_share_pct: 85,
+        fleet_size: 5, waste_generated_tons: 0.09
+      },
+      logistics: {
+        year: 2027, industry_sector: 'Transport & Logistics', region: 'Europe',
+        employee_count: 460, annual_revenue: 4300.0, annual_output_volume: 52.0,
+        electricity_consumption_mwh: 3.8, natural_gas_consumption_mmbtu: 9.0,
+        diesel_consumption_liters: 290, renewable_electricity_share_pct: 30,
+        fleet_size: 98, waste_generated_tons: 0.72
+      },
+      heavy: {
+        year: 2028, industry_sector: 'Heavy Industry', region: 'Asia-Pacific',
+        employee_count: 1600, annual_revenue: 9400.0, annual_output_volume: 42.0,
+        electricity_consumption_mwh: 32.0, natural_gas_consumption_mmbtu: 98.0,
+        diesel_consumption_liters: 380, renewable_electricity_share_pct: 12,
+        fleet_size: 65, waste_generated_tons: 2.45
+      }
+    };
+
+    function applyPreset(key) {
+      const p = PRESETS[key];
+      if (!p) return;
+      document.getElementById('input-year').value = p.year;
+      document.getElementById('input-industry').value = p.industry_sector;
+      document.getElementById('input-region').value = p.region;
+      document.getElementById('input-employees').value = p.employee_count;
+      document.getElementById('input-revenue').value = p.annual_revenue;
+      document.getElementById('input-output').value = p.annual_output_volume;
+      document.getElementById('input-fleet').value = p.fleet_size;
+      document.getElementById('input-elec').value = p.electricity_consumption_mwh;
+      document.getElementById('input-gas').value = p.natural_gas_consumption_mmbtu;
+      document.getElementById('input-diesel').value = p.diesel_consumption_liters;
+      document.getElementById('input-renewable').value = p.renewable_electricity_share_pct;
+      document.getElementById('input-waste').value = p.waste_generated_tons;
+      triggerSimulation();
+    }
+
+    function resetDefaults() {
+      applyPreset('manufacturing');
+    }
+
+    function getInputs() {
+      return {
+        year: parseInt(document.getElementById('input-year').value) || 2027,
+        industry_sector: document.getElementById('input-industry').value,
+        region: document.getElementById('input-region').value,
+        employee_count: parseInt(document.getElementById('input-employees').value) || 518,
+        annual_revenue: parseFloat(document.getElementById('input-revenue').value) || 3165.0,
+        annual_output_volume: parseFloat(document.getElementById('input-output').value) || 9.6,
+        fleet_size: parseInt(document.getElementById('input-fleet').value) || 25,
+        electricity_consumption_mwh: parseFloat(document.getElementById('input-elec').value) || 4.3,
+        natural_gas_consumption_mmbtu: parseFloat(document.getElementById('input-gas').value) || 17.2,
+        diesel_consumption_liters: parseFloat(document.getElementById('input-diesel').value) || 75.0,
+        renewable_electricity_share_pct: parseFloat(document.getElementById('input-renewable').value) || 45.0,
+        waste_generated_tons: parseFloat(document.getElementById('input-waste').value) || 0.24,
+        custom_tax_rate: parseFloat(document.getElementById('slider-custom-rate').value) || 150.0
+      };
+    }
+
+    function calculateLocal(d) {
+      const gas = d.natural_gas_consumption_mmbtu;
+      const diesel = d.diesel_consumption_liters;
+      const elec = d.electricity_consumption_mwh;
+      const ren = Math.max(0, Math.min(100, d.renewable_electricity_share_pct)) / 100.0;
+      const waste = d.waste_generated_tons;
+      const fleet = d.fleet_size;
+
+      const indMult = { 'Manufacturing': 1.05, 'Energy': 1.35, 'Heavy Industry': 1.40, 'Technology': 0.75, 'Transport & Logistics': 1.25, 'Construction': 1.15, 'Healthcare': 0.85, 'Retail': 0.80 };
+      const regMult = { 'Europe': 0.88, 'North America': 0.98, 'Asia-Pacific': 1.20, 'Latin America': 0.90, 'Middle East & Africa': 1.15 };
+
+      const s1 = (gas * 0.05307) + (diesel * 0.00268);
+      const s2 = (elec * 0.385 * (1.0 - ren)) * (regMult[d.region] || 1.0);
+      const s3 = (waste * 0.142) + (fleet * 0.0018);
+      const total = (s1 + s2 + s3) * (0.95 + 0.05 * (indMult[d.industry_sector] || 1.0));
+      const emissions = Math.round(total * 100) / 100;
+
+      const rev = Math.max(1, d.annual_revenue);
+      const intensity = (emissions / rev) * 1000.0;
+
+      let status = 'Optimized Metabolism', color = '#10B981', risk = 'Low', needle = -50;
+      if (intensity < 2.5 && emissions < 10.0) {
+        status = 'Optimized Metabolism'; color = '#10B981'; risk = 'Low Intensity'; needle = -50 + (intensity / 2.5) * 30;
+      } else if (intensity < 6.0 && emissions < 35.0) {
+        status = 'Elevated Operational Pulse'; color = '#F59E0B'; risk = 'Moderate Intensity'; needle = -10 + ((intensity - 2.5) / 3.5) * 40;
+      } else {
+        status = 'Critical Liability Alert'; color = '#EF4444'; risk = 'High Intensity'; needle = 30 + Math.min(40, ((intensity - 6.0) / 10.0) * 40);
+      }
+
+      const allow = d.region === 'Europe' ? 0.20 : 0.25;
+      const taxable = Math.max(0, emissions * (1 - allow));
+
+      return {
+        emissions, taxable,
+        tax50: Math.round(taxable * 50),
+        tax100: Math.round(taxable * 100),
+        tax150: Math.round(taxable * 150),
+        gross50: Math.round(emissions * 50),
+        gross100: Math.round(emissions * 100),
+        gross150: Math.round(emissions * 150),
+        trees: Math.round(emissions * 16.5),
+        km: Math.round(emissions * 4080),
+        oil: (emissions * 2.32).toFixed(1),
+        status, color, risk, needle,
+        intensity: intensity.toFixed(2)
+      };
+    }
+
+    async function triggerSimulation() {
+      const inputs = getInputs();
+
+      document.getElementById('val-elec').textContent = inputs.electricity_consumption_mwh;
+      document.getElementById('val-gas').textContent = inputs.natural_gas_consumption_mmbtu;
+      document.getElementById('val-diesel').textContent = inputs.diesel_consumption_liters;
+      document.getElementById('val-renewable').textContent = inputs.renewable_electricity_share_pct;
+      document.getElementById('val-waste').textContent = inputs.waste_generated_tons;
+      document.getElementById('kpi-year').textContent = inputs.year;
+
+      let res = null;
+      try {
+        const resp = await fetch('/api/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(inputs)
+        });
+        if (resp.ok) {
+          const json = await resp.json();
+          if (json.success && json.data) {
+            const d = json.data;
+            res = {
+              emissions: d.predicted_emissions_tco2e,
+              taxable: d.taxable_emissions_tco2e,
+              tax50: d.scenarios.rate_50.tax_liability,
+              tax100: d.scenarios.rate_100.tax_liability,
+              tax150: d.scenarios.rate_150.tax_liability,
+              gross50: d.scenarios.rate_50.gross_liability,
+              gross100: d.scenarios.rate_100.gross_liability,
+              gross150: d.scenarios.rate_150.gross_liability,
+              trees: d.offset_equivalence.tree_seedlings_10yr,
+              km: d.offset_equivalence.passenger_vehicle_km,
+              oil: d.offset_equivalence.barrels_oil_equiv,
+              status: d.pulse_metabolism.status,
+              color: d.pulse_metabolism.color,
+              risk: d.pulse_metabolism.risk_level + ' Intensity',
+              needle: d.pulse_metabolism.color === '#10B981' ? -40 : (d.pulse_metabolism.color === '#F59E0B' ? 0 : 45),
+              intensity: d.pulse_metabolism.intensity_ratio
+            };
+          }
+        }
+      } catch (e) {
+        console.debug('API call fallback to local pipeline:', e);
+      }
+
+      if (!res) res = calculateLocal(inputs);
+
+      latestEmissions = res.emissions;
+      latestTaxable = res.taxable;
+
+      // Update Top KPIs
+      targetPulseColor = res.color;
+      currentIntensity = parseFloat(res.intensity);
+
+      document.getElementById('pulse-status-badge').textContent = res.status;
+      document.getElementById('pulse-status-badge').style.color = res.color;
+      document.getElementById('pulse-dot-indicator').style.backgroundColor = res.color;
+      document.getElementById('pulse-dot-indicator').style.boxShadow = `0 0 12px ${res.color}`;
+      document.getElementById('pulse-intensity-display').textContent = `${res.intensity} tCO2e / $M`;
+
+      document.getElementById('kpi-emissions').textContent = res.emissions.toFixed(2);
+      document.getElementById('kpi-emissions').style.color = res.color;
+      document.getElementById('kpi-status-text').textContent = res.status;
+      document.getElementById('kpi-status-container').style.color = res.color;
+      document.getElementById('kpi-status-container').style.borderColor = `${res.color}40`;
+
+      const selectedRate = inputs.custom_tax_rate || 150;
+      const selectedLiability = Math.round(res.taxable * selectedRate);
+      document.getElementById('kpi-tax-liability').textContent = Number(selectedLiability).toLocaleString();
+      document.getElementById('kpi-tax-rate-label').textContent = `($${selectedRate}/ton tax)`;
+
+      const needle = document.getElementById('gauge-needle-group');
+      if (needle) needle.setAttribute('transform', `rotate(${res.needle}, 80, 80)`);
+      document.getElementById('kpi-intensity-label').textContent = res.risk;
+      document.getElementById('kpi-intensity-label').style.color = res.color;
+
+      // Bar Chart
+      document.getElementById('tax-bill-50').textContent = '$' + Number(res.tax50).toLocaleString();
+      document.getElementById('gross-bill-50').textContent = '$' + Number(res.gross50).toLocaleString();
+      document.getElementById('tax-bill-100').textContent = '$' + Number(res.tax100).toLocaleString();
+      document.getElementById('gross-bill-100').textContent = '$' + Number(res.gross100).toLocaleString();
+      document.getElementById('tax-bill-150').textContent = '$' + Number(res.tax150).toLocaleString();
+      document.getElementById('gross-bill-150').textContent = '$' + Number(res.gross150).toLocaleString();
+
+      const maxVal = Math.max(res.gross150, 100);
+      document.getElementById('bar-50-base').style.height = `${Math.max(15, (res.gross50 / maxVal) * 95)}%`;
+      document.getElementById('bar-50-net').style.height = `${Math.max(10, (res.tax50 / maxVal) * 95)}%`;
+      document.getElementById('bar-100-base').style.height = `${Math.max(20, (res.gross100 / maxVal) * 95)}%`;
+      document.getElementById('bar-100-net').style.height = `${Math.max(15, (res.tax100 / maxVal) * 95)}%`;
+      document.getElementById('bar-150-base').style.height = `${Math.max(25, (res.gross150 / maxVal) * 95)}%`;
+      document.getElementById('bar-150-net').style.height = `${Math.max(20, (res.tax150 / maxVal) * 95)}%`;
+
+      // Equivalence
+      document.getElementById('offset-emissions-sync').textContent = res.emissions.toFixed(2);
+      document.getElementById('equiv-trees').textContent = Number(res.trees).toLocaleString();
+      document.getElementById('equiv-km').textContent = Number(res.km).toLocaleString() + ' km';
+      document.getElementById('equiv-oil').textContent = res.oil;
+
+      // Update Stress Scenarios Table & Matrix
+      renderStressScenarios(res.emissions, res.taxable);
+      // Update Equivalence Decoders View
+      renderEquivalenceGrid(res.emissions);
+      updateNeutralization();
+    }
+
+    function renderStressScenarios(emissions, taxable) {
+      const bms = [
+        { name: 'European Union ETS (Phase IV)', rate: 95, allowance: 20 },
+        { name: 'North American Regional (CARB)', rate: 45, allowance: 25 },
+        { name: 'United Kingdom ETS Benchmark', rate: 70, allowance: 15 },
+        { name: 'IPCC 1.5°C Paris Stressed Corridor', rate: 175, allowance: 0 }
+      ];
+      const tbody = document.getElementById('benchmarks-table-body');
+      if (tbody) {
+        tbody.innerHTML = bms.map(b => {
+          const gross = Math.round(emissions * b.rate);
+          const net = Math.round(emissions * (1 - b.allowance / 100) * b.rate);
+          return `<tr class="hover:bg-slate-800/40 transition-colors">
+            <td class="py-2.5 px-3 font-sans text-white font-medium">${b.name}</td>
+            <td class="py-2.5 px-3 font-mono text-slate-300">$${b.rate}/t</td>
+            <td class="py-2.5 px-3 text-slate-400">${b.allowance}% free</td>
+            <td class="py-2.5 px-3 text-right text-slate-300">$${gross.toLocaleString()}</td>
+            <td class="py-2.5 px-3 text-right font-bold text-emerald-400">$${net.toLocaleString()}</td>
+          </tr>`;
+        }).join('');
+      }
+
+      const rates = [30, 50, 75, 100, 150, 200];
+      const sensBody = document.getElementById('sensitivity-table-body');
+      if (sensBody) {
+        sensBody.innerHTML = rates.map(r => {
+          return `<tr class="hover:bg-slate-800/40 transition-colors">
+            <td class="py-2.5 px-3 font-sans font-medium text-white">$${r} / ton</td>
+            <td class="py-2.5 px-3 text-right text-slate-300">$${Math.round(taxable * r).toLocaleString()}</td>
+            <td class="py-2.5 px-3 text-right text-slate-300">$${Math.round(taxable * 0.8 * r).toLocaleString()}</td>
+            <td class="py-2.5 px-3 text-right text-emerald-300">$${Math.round(taxable * 0.6 * r).toLocaleString()}</td>
+            <td class="py-2.5 px-3 text-right text-emerald-400 font-bold">$${Math.round(taxable * 0.4 * r).toLocaleString()}</td>
+          </tr>`;
+        }).join('');
+      }
+    }
+
+    function renderEquivalenceGrid(emissions) {
+      const container = document.getElementById('extended-equivalences-grid');
+      if (!container) return;
+      const cards = [
+        { title: 'Tree Seedlings (10-Yr)', val: Math.round(emissions * 16.5).toLocaleString(), desc: 'EPA 16.5× sequestration factor' },
+        { title: 'Passenger Vehicle KM', val: Math.round(emissions * 4080).toLocaleString() + ' km', desc: 'Average internal combustion vehicle' },
+        { title: 'Barrels of Crude Oil', val: (emissions * 2.32).toFixed(1), desc: 'Direct thermal fuel combustion' },
+        { title: 'Homes Electricity / Year', val: (emissions * 0.19).toFixed(1), desc: 'Average annual residential consumption' },
+        { title: 'Smartphones Charged', val: Math.round(emissions * 121643).toLocaleString(), desc: '121,643 full recharges per ton' },
+        { title: 'Pounds of Coal Burned', val: Math.round(emissions * 1102).toLocaleString() + ' lbs', desc: 'Power plant thermal fuel burned' },
+        { title: 'Transatlantic Flights (NY-LON)', val: (emissions / 0.85).toFixed(1), desc: 'Round-trip passenger emissions' },
+        { title: 'Acres of Forest Preserved', val: (emissions * 1.22).toFixed(1) + ' acres', desc: 'US forest annual carbon sink' }
+      ];
+      container.innerHTML = cards.map(c => `
+        <div class="glass-card rounded-xl p-4 border border-white/10 flex flex-col justify-between">
+          <div>
+            <div class="text-[11px] font-semibold text-slate-400">${c.title}</div>
+            <div class="text-xl font-extrabold font-mono-nums text-white mt-1">${c.val}</div>
+          </div>
+          <div class="text-[10px] text-slate-500 mt-2 border-t border-white/5 pt-1.5">${c.desc}</div>
+        </div>
+      `).join('');
+    }
+
+    function updateNeutralization() {
+      const price = parseFloat(document.getElementById('slider-offset-price').value) || 25;
+      document.getElementById('label-offset-price').textContent = price;
+      document.getElementById('plan-tons-neutralize').textContent = latestEmissions.toFixed(2);
+      const credits = Math.ceil(latestEmissions);
+      document.getElementById('plan-credits-needed').textContent = credits;
+      document.getElementById('plan-total-cost').textContent = (credits * price).toLocaleString();
+    }
+
+    // Attach Event Listeners
+    ['input-year', 'input-industry', 'input-region', 'input-employees',
+     'input-revenue', 'input-output', 'input-fleet', 'input-elec',
+     'input-gas', 'input-diesel', 'input-renewable', 'input-waste'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', triggerSimulation);
+    });
+
+    document.getElementById('slider-custom-rate').addEventListener('input', (e) => {
+      document.getElementById('label-custom-rate').textContent = e.target.value;
+      triggerSimulation();
+    });
+
+    function exportCSVReport() {
+      const inputs = getInputs();
+      const res = calculateLocal(inputs);
+      const csv = "data:text/csv;charset=utf-8," +
+        "Metric,Value,Unit\n" +
+        `Emissions,${res.emissions},tCO2e\n` +
+        `Taxable Emissions,${res.taxable},tCO2e\n` +
+        `Tax Liability ($50/t),$${res.tax50},USD\n` +
+        `Tax Liability ($100/t),$${res.tax100},USD\n` +
+        `Tax Liability ($150/t),$${res.tax150},USD\n` +
+        `Tree Seedlings,${res.trees},seedlings\n` +
+        `Passenger Vehicle KM,${res.km},km\n`;
+      const link = document.createElement("a");
+      link.setAttribute("href", encodeURI(csv));
+      link.setAttribute("download", `CarbonPulse_Report_${inputs.year}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Initial load
+    triggerSimulation();
+  </script>
+</body>
+</html>
